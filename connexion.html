@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - EventBenin Location</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Segoe+UI&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-light">
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-layer-group"></i> EventBenin<span style="color:var(--secondary-color)">.</span>
+            </a>
+            <a href="index.html" class="nav-link">Retour au site</a>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <div class="text-center" style="margin-bottom: 2rem;">
+            <h2 class="section-title" style="font-size: 1.8rem;">Connexion</h2>
+            <p style="color: var(--text-gray);">Accédez à votre espace personnel</p>
+        </div>
+
+        <form onsubmit="event.preventDefault(); window.location.href='dashboard-loueur.html';">
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" placeholder="exemple@email.com" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Mot de passe</label>
+                <input type="password" class="form-control" placeholder="••••••••" required>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; font-size: 0.9rem;">
+                <label class="checkbox-label" style="margin: 0;"><input type="checkbox"> Se souvenir de moi</label>
+                <a href="#" style="color: var(--primary-color);">Mot de passe oublié ?</a>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Se connecter</button>
+        </form>
+
+        <div class="text-center" style="margin-top: 1.5rem; font-size: 0.9rem;">
+            Pas encore de compte ? <a href="inscription.html" style="color: var(--primary-color); font-weight: 600;">S'inscrire</a>
+        </div>
+    </div>
+
+</body>
+</html>
