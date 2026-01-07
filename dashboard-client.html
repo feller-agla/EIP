@@ -17,7 +17,10 @@
             
             <!-- Sidebar -->
             <aside class="dashboard-sidebar">
-                <nav>
+                <button class="btn btn-outline mobile-filter-toggle" id="dashboard-toggle" style="width: 100%; margin-bottom: 1rem;">
+                    <i class="fas fa-bars"></i> Menu Dashboard
+                </button>
+                <nav id="dashboard-nav" class="sidebar-content">
                     <a href="#" class="dash-nav-item active"><i class="fas fa-home"></i> Vue d'ensemble</a>
                     <a href="#" class="dash-nav-item"><i class="fas fa-calendar-check"></i> Mes Réservations</a>
                     <a href="#" class="dash-nav-item"><i class="fas fa-heart"></i> Favoris</a>
@@ -31,7 +34,7 @@
                 <h2 class="section-title" style="font-size: 1.5rem; margin-bottom: 1.5rem;" id="welcome-msg">Bienvenue 👋</h2>
                 
                 <!-- Stats rapides -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
                         <div>
@@ -108,6 +111,17 @@
                      `;
                  }).join('');
              }
+
+            // Mobile Dashboard Toggle
+            const dashToggle = document.getElementById('dashboard-toggle');
+            const dashNav = document.getElementById('dashboard-nav');
+            if (dashToggle && dashNav) {
+                dashToggle.addEventListener('click', () => {
+                    const isHidden = dashNav.style.display === 'none' || dashNav.style.display === '';
+                    dashNav.style.display = isHidden ? 'flex' : 'none';
+                    dashNav.style.flexDirection = 'column';
+                });
+            }
         });
     </script>
 </body>
