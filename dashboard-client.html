@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Espace - EventBenin Location</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Segoe+UI&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-light">
+
+    <!-- Header injected by app.js -->
+
+    <div class="container" style="margin-top: 2rem;">
+        <div class="dashboard-grid">
+            
+            <!-- Sidebar -->
+            <aside class="dashboard-sidebar">
+                <nav>
+                    <a href="#" class="dash-nav-item active"><i class="fas fa-home"></i> Vue d'ensemble</a>
+                    <a href="#" class="dash-nav-item"><i class="fas fa-calendar-check"></i> Mes Réservations</a>
+                    <a href="#" class="dash-nav-item"><i class="fas fa-heart"></i> Favoris</a>
+                    <a href="#" class="dash-nav-item"><i class="fas fa-user-circle"></i> Mon Profil</a>
+                    <a href="#" onclick="App.logout()" class="dash-nav-item" style="color: var(--accent-color); margin-top: 2rem;"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main>
+                <h2 class="section-title" style="font-size: 1.5rem; margin-bottom: 1.5rem;" id="welcome-msg">Bienvenue 👋</h2>
+                
+                <!-- Stats rapides -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <div>
+                            <div class="stat-value" id="stats-active-count">0</div>
+                            <div class="stat-label">Réservations actives</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Réservations en cours -->
+                <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--border-color); padding: 1.5rem; margin-bottom: 2rem;">
+                    <h3 style="font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-clock" style="color: var(--primary-color);"></i> Historique des Réservations
+                    </h3>
+                    
+                    <div id="orders-list">
+                        <!-- Injected by JS -->
+                        <p style="color: var(--text-gray);">Aucune réservation pour le moment.</p>
+                    </div>
+                </div>
+
+                <!-- Action rapide -->
+                <div style="background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: white; border-radius: var(--radius-lg); padding: 2rem; text-align: center;">
+                    <i class="fas fa-plus-circle" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.9;"></i>
+                    <h3 style="margin-bottom: 0.5rem; color: white;">Planifier un nouvel événement ?</h3>
+                    <p style="opacity: 0.9; margin-bottom: 1.5rem; color: white;">Parcourez notre catalogue et réservez en quelques clics.</p>
+                    <a href="catalogue.html" class="btn btn-secondary">Explorer le Catalogue</a>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/store.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        document.addEventListener('appReady', () => {
+             const user = Store.getUser();
+             if (!user) {
+                 window.location.href = 'connexion.html';
+                 return;
+             }
+             document.getElementById('welcome-msg').textContent = `Bienvenue, ${user.name} 👋`;
+             
+             const orders = Store.getUserOrders();
+             document.getElementById('stats-active-count').textContent = orders.length;
+
+             const list = document.getElementById('orders-list');
+             if (orders.length > 0) {
+                 const products = Store.getAllProducts();
+                 
+                 list.innerHTML = orders.map(order => {
+                     // Get first 3 items for display
+                     const previewItems = order.items.slice(0, 3).map(i => {
+                         const p = products.find(prod => prod.id === i.productId);
+                         return p ? p.name : 'Produit';
+                     }).join(', ');
+                     
+                     return `
+                        <div style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 1rem; background: var(--bg-light);">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                                <div>
+                                    <h4 style="font-weight: 700; margin-bottom: 0.25rem;">Commande ${order.id}</h4>
+                                    <p style="color: var(--text-gray); font-size: 0.9rem;">${Utils.formatDate(order.date)} • ${order.eventLocation}</p>
+                                </div>
+                                <span style="background: #DEF7EC; color: #03543F; padding: 4px 12px; border-radius: var(--radius-full); font-size: 0.85rem; font-weight: 600;">${order.status}</span>
+                            </div>
+                            <div style="margin-bottom: 1rem; font-size: 0.9rem;">
+                                <strong>Articles:</strong> ${previewItems}${order.items.length > 3 ? '...' : ''}
+                            </div>
+                            <div style="font-weight: 700; color: var(--primary-color);">Total: ${Utils.formatCurrency(order.amount)}</div>
+                        </div>
+                     `;
+                 }).join('');
+             }
+        });
+    </script>
+</body>
+</html>
