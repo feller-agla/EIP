@@ -17,6 +17,14 @@ const Store = {
         // Charger les produits s'ils n'existent pas
         if (!localStorage.getItem(Store.KEYS.PRODUCTS)) {
             localStorage.setItem(Store.KEYS.PRODUCTS, JSON.stringify(APP_DATA.projects));
+        } else {
+            // MERGE/RESET Strategy for Demo: 
+            // If the structure is too different or we want to force updates, we might need to reset.
+            // For now, let's just check if "Packs" exist, if not, reset to ensure new data is loaded.
+            const currentProds = JSON.parse(localStorage.getItem(Store.KEYS.PRODUCTS));
+            if (!currentProds.find(p => p.category === 'packs')) {
+               localStorage.setItem(Store.KEYS.PRODUCTS, JSON.stringify(APP_DATA.projects));
+            }
         }
         
         // Initialiser panier vide si inexistant
@@ -36,8 +44,62 @@ const Store = {
     },
 
     getProductById: (id) => {
-        const products = Store.getAllProducts();
+        const products = JSON.parse(localStorage.getItem(Store.KEYS.PRODUCTS) || '[]');
         return products.find(p => p.id === id);
+    },
+
+    addProduct: (product) => {
+        const products = JSON.parse(localStorage.getItem(Store.KEYS.PRODUCTS) || '[]');
+        const newProduct = {
+            id: Utils.generateId(),
+            ...product
+        };
+        products.push(newProduct);
+        localStorage.setItem(Store.KEYS.PRODUCTS, JSON.stringify(products));
+        return newProduct;
+    },
+
+    // Check availability for a specific date range (basic implementation: per single date)
+    checkStock: (productId, date, quantity) => {
+        const product = Store.getProductById(productId);
+        if (!product) return false;
+
+        const allOrders = JSON.parse(localStorage.getItem(Store.KEYS.ORDERS) || '[]');
+        
+        // Filter orders that are CONFIRMED and cover this date
+        // Note: Our simple model just has one "eventDate". 
+        // In a real app, we'd need start/end dates.
+        const activeOrders = allOrders.filter(o => 
+            (o.status === 'Confirmé' || o.status === 'En attente') && 
+            o.eventDate === date
+        );
+
+        let reservedQuantity = 0;
+        activeOrders.forEach(order => {
+            const item = order.items.find(i => i.productId === productId);
+            if (item) reservedQuantity += item.quantity;
+        });
+
+        return (product.stock - reservedQuantity) >= quantity;
+    },
+
+    getAvailableStock: (productId, date) => {
+        const product = Store.getProductById(productId);
+        if (!product) return 0;
+        
+        const allOrders = JSON.parse(localStorage.getItem(Store.KEYS.ORDERS) || '[]');
+        const activeOrders = allOrders.filter(o => 
+            (o.status === 'Confirmé' || o.status === 'En attente') && 
+            o.eventDate === date
+        );
+
+        let reservedQuantity = 0;
+        activeOrders.forEach(order => {
+            const item = order.items.find(i => i.productId === productId);
+            if (item) reservedQuantity += item.quantity;
+        });
+        
+        return Math.max(0, product.stock - reservedQuantity);
     },
 
     // --- PANIER ---
@@ -48,6 +110,20 @@ const Store = {
     addToCart: (productId, quantity = 1) => {
         const cart = Store.getCart();
         const existingItem = cart.find(item => item.productId === productId);
+        
+        // Simple global stock check (not date specific yet because date is chosen at checkout)
+        // For the cart, we just check against total stock.
+        const product = Store.getProductById(productId);
+        const currentQtyInCart = existingItem ? existingItem.quantity : 0;
+        
+        if ((currentQtyInCart + parseInt(quantity)) > product.stock) {
+             if (window.Utils && Utils.showToast) {
+                Utils.showToast(`Stock insuffisant. Max disponible: ${product.stock}`, 'error');
+             } else {
+                alert(`Stock insuffisant. Max disponible: ${product.stock}`);
+             }
+             return false;
+        }
 
         if (existingItem) {
             existingItem.quantity += parseInt(quantity);
@@ -57,6 +133,8 @@ const Store = {
         
         localStorage.setItem(Store.KEYS.CART, JSON.stringify(cart));
         Store.notifyObservers('cartUpdated');
+        if (window.Utils && Utils.showToast) Utils.showToast("Article ajouté au panier !");
+        return true;
     },
 
     removeFromCart: (productId) => {
@@ -140,9 +218,11 @@ const Store = {
     createOrder: (orderDetails) => {
         const orders = JSON.parse(localStorage.getItem(Store.KEYS.ORDERS) || '[]');
         const newOrder = {
-            id: 'RES-2026-' + Math.floor(100 + Math.random() * 900), // ex: RES-2026-105
+            id: 'RES-2026-' + Math.floor(1000 + Math.random() * 9000), 
             date: new Date().toISOString(),
-            status: 'En attente', // En attente, Confirmé, Terminé
+            status: 'En attente', // En attente, Confirmé, Terminé, Annulé
+            paymentType: orderDetails.paymentType || 'full', // 'full' or 'deposit'
+            remainingBalance: orderDetails.remainingBalance || 0,
             ...orderDetails
         };
         orders.unshift(newOrder); // Ajouter au début

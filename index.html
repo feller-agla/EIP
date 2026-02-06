@@ -22,7 +22,8 @@
     <!-- Hero Section -->
     <header id="accueil" class="hero">
         <div class="container">
-            <div class="hero-content">
+            <!-- Client / Guest Hero Content -->
+            <div class="hero-content" id="hero-client">
                 <h1>Simplifiez l'organisation de vos événements au Bénin</h1>
                 <p>Trouvez et louez tout votre matériel événementiel sur une seule plateforme : sonorisation, mobilier, décoration et plus encore.</p>
                 
@@ -35,6 +36,16 @@
 
                 <div class="hero-buttons">
                     <a href="catalogue.html" class="btn btn-secondary">Voir le catalogue</a>
+                </div>
+            </div>
+
+            <!-- Vendor Hero Content (Hidden by default) -->
+            <div class="hero-content" id="hero-vendor" style="display: none;">
+                <h1>Gérez votre activité de location comme un Pro</h1>
+                <p>Suivez vos stocks, validez vos commandes et boostez votre chiffre d'affaires depuis votre tableau de bord.</p>
+                
+                <div class="hero-buttons">
+                    <a href="dashboard-loueur.html" class="btn btn-primary btn-lg"><i class="fas fa-tachometer-alt"></i> Accéder à mon Dashboard</a>
                 </div>
             </div>
         </div>
@@ -141,7 +152,7 @@
         <div class="container">
             <h2 class="section-title" style="color:white">Professionnels de l'événementiel ?</h2>
             <p class="section-subtitle" style="color: rgba(255,255,255,0.8)">Digitalisez votre activité et touchez plus de clients.</p>
-            <a href="inscription.html" class="btn btn-primary" style="background: white; color: var(--primary-color);">Devenir Partenaire</a>
+            <a href="inscription.html?role=vendor" class="btn btn-primary" style="background: white; color: var(--primary-color);">Devenir Partenaire</a>
         </div>
     </section>
 

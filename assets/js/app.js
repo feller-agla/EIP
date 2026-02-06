@@ -15,8 +15,44 @@ const App = {
         // 3. Setup des listeners globaux
         App.setupGlobalListeners();
         
-        // 4. Dispatch event 'appReady' pour les scripts spécifiques aux pages
+        // 4. Access Control (Security)
+        App.checkAccessControl();
+
+        // 5. Dispatch event 'appReady' pour les scripts spécifiques aux pages
         document.dispatchEvent(new Event('appReady'));
+    },
+
+    checkAccessControl: () => {
+        const user = Store.getUser();
+        const path = window.location.pathname;
+        const page = path.split('/').pop();
+
+        // List of pages restricted for Vendors
+        const clientOnlyPages = ['catalogue.html', 'panier.html', 'checkout.html', 'product-details.html'];
+        
+        // List of pages restricted for Clients
+        const vendorOnlyPages = ['dashboard-loueur.html', 'profile-loueur.html']; // profile-loueur is public usually? "Public Vendor Profile" -> Client should see it.
+        // Wait, "profile-loueur.html" is likely the public view. "dashboard-loueur.html" is private.
+
+        if (user && user.role === 'vendor') {
+            if (clientOnlyPages.includes(page)) {
+                alert("Espace réservé aux clients. Redirection vers votre tableau de bord.");
+                window.location.href = 'dashboard-loueur.html';
+            }
+        }
+        
+        if (user && user.role === 'client') {
+            if (page === 'dashboard-loueur.html') {
+                window.location.href = 'dashboard-client.html';
+            }
+        }
+        
+        // Protect Dashboards if not logged in
+        if (!user) {
+            if (page === 'dashboard-loueur.html' || page === 'dashboard-client.html' || page === 'checkout.html' || page === 'panier.html') {
+                window.location.href = 'connexion.html';
+            }
+        }
     },
 
     loadHeader: async () => {
@@ -28,6 +64,7 @@ const App = {
 
         const user = Store.getUser();
         const isLoggedIn = !!user;
+        const isVendor = user?.role === 'vendor';
 
         header.innerHTML = `
             <div class="container">
@@ -39,36 +76,43 @@ const App = {
                     <i class="fas fa-bars"></i>
                 </div>
 
-                <ul class="nav-menu">
-                    <li><a href="index.html" class="nav-link ${App.isActive('index.html')}">Accueil</a></li>
-                    <li><a href="catalogue.html" class="nav-link ${App.isActive('catalogue.html')}">Catalogue</a></li>
-                    <li><a href="index.html#comment-ca-marche" class="nav-link">Comment ça marche</a></li>
+                <div class="nav-collapse">
+                    <ul class="nav-menu">
+                        <li><a href="index.html" class="nav-link ${App.isActive('index.html')}">Accueil</a></li>
+                        <li><a href="catalogue.html" class="nav-link ${App.isActive('catalogue.html')}">Catalogue</a></li>
+                        
+                        ${isVendor ? 
+                            `<li><a href="dashboard-loueur.html" class="nav-link ${App.isActive('dashboard-loueur.html')}">Espace Loueur</a></li>` :
+                            `<li><a href="index.html#comment-ca-marche" class="nav-link">Comment ça marche</a></li>`
+                        }
+                    </ul>
                     
                     <div class="nav-actions">
-                         <!-- Cart Icon -->
+                        <!-- Cart Icon (Hidden for Vendors) -->
+                        ${!isVendor ? `
                         <a href="panier.html" class="icon-btn" title="Mon Panier">
                             <i class="fas fa-shopping-cart"></i>
                             <span class="badge" id="cart-count">0</span>
-                        </a>
+                        </a>` : ''}
 
                         <!-- User Menu -->
                         ${isLoggedIn ? `
                             <div class="user-dropdown">
-                                <div class="user-avatar">${user.avatar}</div>
+                                <div class="user-avatar">${user.avatar || (user.name ? user.name.charAt(0) : 'U')}</div>
                                 <div class="dropdown-menu">
                                     <div style="padding: 1rem; border-bottom: 1px solid var(--border-color);">
                                         <strong>${user.name}</strong><br>
                                         <small style="color:var(--text-gray)">${user.email}</small>
                                     </div>
-                                    <a href="${user.role === 'vendor' ? 'dashboard-loueur.html' : 'dashboard-client.html'}" class="dropdown-item"><i class="fas fa-th-large"></i> Mon Tableau de bord</a>
+                                    <a href="${isVendor ? 'dashboard-loueur.html' : 'dashboard-client.html'}" class="dropdown-item"><i class="fas fa-th-large"></i> Mon Tableau de bord</a>
                                     <a href="#" onclick="App.logout()" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
                                 </div>
                             </div>
                         ` : `
-                            <a href="connexion.html" class="btn btn-primary btn-sm">Boutique / Connexion</a>
+                            <a href="connexion.html" class="btn btn-primary btn-sm">Compte</a>
                         `}
                     </div>
-                </ul>
+                </div>
             </div>
         `;
     },
@@ -133,7 +177,7 @@ const App = {
 
         // Mobile Menu Toggle
         const toggle = document.querySelector('.mobile-toggle');
-        const menu = document.querySelector('.nav-menu');
+        const menu = document.querySelector('.nav-collapse');
         
         if (toggle && menu) {
             toggle.addEventListener('click', () => {
@@ -148,6 +192,22 @@ const App = {
                 }
             });
         }
+
+        // Dropdown Toggle (Stability Fix)
+        document.addEventListener('click', (e) => {
+            const dropdown = document.querySelector('.user-dropdown');
+            const menu = document.querySelector('.dropdown-menu');
+            
+            if (dropdown && menu) {
+                // If clicking inside dropdown, toggle
+                if (dropdown.contains(e.target)) {
+                    menu.classList.toggle('show');
+                } else {
+                    // Click outside -> close
+                    menu.classList.remove('show');
+                }
+            }
+        });
     },
 
     isActive: (page) => {

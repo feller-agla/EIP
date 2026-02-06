@@ -21,51 +21,98 @@
                     <i class="fas fa-bars"></i> Menu Dashboard
                 </button>
                 <nav id="dashboard-nav" class="sidebar-content">
-                    <a href="#" class="dash-nav-item active"><i class="fas fa-home"></i> Vue d'ensemble</a>
-                    <a href="#" class="dash-nav-item"><i class="fas fa-calendar-check"></i> Mes Réservations</a>
-                    <a href="#" class="dash-nav-item"><i class="fas fa-heart"></i> Favoris</a>
-                    <a href="#" class="dash-nav-item"><i class="fas fa-user-circle"></i> Mon Profil</a>
-                    <a href="#" onclick="App.logout()" class="dash-nav-item" style="color: var(--accent-color); margin-top: 2rem;"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                    <a href="#overview" class="dash-nav-item active"><i class="fas fa-home"></i> Vue d'ensemble</a>
+                    <a href="#reservations" class="dash-nav-item"><i class="fas fa-calendar-check"></i> Mes Réservations</a>
+                    <a href="#invoices" class="dash-nav-item"><i class="fas fa-file-invoice"></i> Factures</a>
+                    <a href="#profile" class="dash-nav-item"><i class="fas fa-user-circle"></i> Mon Profil</a>
+                    <a href="#logout" onclick="Store.logout()" class="dash-nav-item" style="color: var(--accent-color); margin-top: 2rem;"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
                 </nav>
             </aside>
 
             <!-- Main Content -->
-            <main>
-                <h2 class="section-title" style="font-size: 1.5rem; margin-bottom: 1.5rem;" id="welcome-msg">Bienvenue 👋</h2>
-                
-                <!-- Stats rapides -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
-                        <div>
-                            <div class="stat-value" id="stats-active-count">0</div>
-                            <div class="stat-label">Réservations actives</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Réservations en cours -->
-                <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--border-color); padding: 1.5rem; margin-bottom: 2rem;">
-                    <h3 style="font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-clock" style="color: var(--primary-color);"></i> Historique des Réservations
-                    </h3>
-                    
-                    <div id="orders-list">
-                        <!-- Injected by JS -->
-                        <p style="color: var(--text-gray);">Aucune réservation pour le moment.</p>
-                    </div>
-                </div>
-
-                <!-- Action rapide -->
-                <div style="background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: white; border-radius: var(--radius-lg); padding: 2rem; text-align: center;">
-                    <i class="fas fa-plus-circle" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.9;"></i>
-                    <h3 style="margin-bottom: 0.5rem; color: white;">Planifier un nouvel événement ?</h3>
-                    <p style="opacity: 0.9; margin-bottom: 1.5rem; color: white;">Parcourez notre catalogue et réservez en quelques clics.</p>
-                    <a href="catalogue.html" class="btn btn-secondary">Explorer le Catalogue</a>
-                </div>
+            <main id="main-content">
+                <!-- Views will be injected here -->
             </main>
         </div>
     </div>
+
+    <!-- Templates for Views -->
+    <template id="view-overview">
+        <h2 class="section-title" style="font-size: 1.5rem; margin-bottom: 1.5rem;" id="welcome-msg">Bienvenue 👋</h2>
+        
+        <!-- Stats rapides -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
+                <div>
+                    <div class="stat-value" id="stats-active-count">0</div>
+                    <div class="stat-label">Réservations actives</div>
+                </div>
+            </div>
+             <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+                <div>
+                    <div class="stat-value" id="stats-total-spent">0</div>
+                    <div class="stat-label">Total Dépensé</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Réservations en cours -->
+        <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--border-color); padding: 1.5rem; margin-bottom: 2rem;">
+            <h3 style="font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-clock" style="color: var(--primary-color);"></i> Dernières Activités
+            </h3>
+            
+            <div id="recent-orders-list">
+                <!-- Injected by JS -->
+            </div>
+        </div>
+
+        <!-- Action rapide -->
+        <div style="background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: white; border-radius: var(--radius-lg); padding: 2rem; text-align: center;">
+            <i class="fas fa-plus-circle" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.9;"></i>
+            <h3 style="margin-bottom: 0.5rem; color: white;">Planifier un nouvel événement ?</h3>
+            <p style="opacity: 0.9; margin-bottom: 1.5rem; color: white;">Parcourez notre catalogue et réservez en quelques clics.</p>
+            <a href="catalogue.html" class="btn btn-secondary">Explorer le Catalogue</a>
+        </div>
+    </template>
+
+    <template id="view-reservations">
+        <h2 class="section-title" style="font-size: 1.5rem; margin-bottom: 1.5rem;">Mes Réservations</h2>
+        <div class="filter-group" style="border: none; padding: 0;">
+             <button class="btn btn-sm btn-primary" onclick="renderReservations('all')">Toutes</button>
+             <button class="btn btn-sm btn-outline" onclick="renderReservations('En attente')">En attente</button>
+             <button class="btn btn-sm btn-outline" onclick="renderReservations('Confirmé')">Confirmées</button>
+        </div>
+        <div id="all-orders-list" style="margin-top: 1rem;"></div>
+    </template>
+
+    <template id="view-invoices">
+        <h2 class="section-title" style="font-size: 1.5rem; margin-bottom: 1.5rem;">Mes Factures</h2>
+        <div id="invoices-list"></div>
+    </template>
+
+    <template id="view-profile">
+        <h2 class="section-title" style="font-size: 1.5rem; margin-bottom: 1.5rem;">Mon Profil</h2>
+        <div style="background: white; padding: 2rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); max-width: 600px;">
+            <form id="profile-form">
+                <div class="mb-1">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Nom Complet</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="profile-name" type="text" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+                </div>
+                 <div class="mb-1">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="email">Email</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="profile-email" type="email" readonly style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: #eee;">
+                </div>
+                <div class="mb-1">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="phone">Téléphone</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="profile-phone" type="text" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+                </div>
+                <button type="submit" class="btn btn-primary mt-1">Enregistrer les modifications</button>
+            </form>
+        </div>
+    </template>
 
     <script src="assets/js/data.js"></script>
     <script src="assets/js/utils.js"></script>
@@ -78,51 +125,142 @@
                  window.location.href = 'connexion.html';
                  return;
              }
-             document.getElementById('welcome-msg').textContent = `Bienvenue, ${user.name} 👋`;
+
+             // Bind Navigation
+             document.querySelectorAll('.dash-nav-item').forEach(link => {
+                 link.addEventListener('click', (e) => {
+                     e.preventDefault();
+                     const target = e.currentTarget.getAttribute('href').substring(1); // removes #
+                     if (target && target !== 'logout') {
+                        renderClientView(target);
+                        // Update active state
+                        document.querySelectorAll('.dash-nav-item').forEach(l => l.classList.remove('active'));
+                        e.currentTarget.classList.add('active');
+                     }
+                 });
+             });
              
-             const orders = Store.getUserOrders();
-             document.getElementById('stats-active-count').textContent = orders.length;
+             // Initial View
+             renderClientView('overview');
 
-             const list = document.getElementById('orders-list');
-             if (orders.length > 0) {
-                 const products = Store.getAllProducts();
-                 
-                 list.innerHTML = orders.map(order => {
-                     // Get first 3 items for display
-                     const previewItems = order.items.slice(0, 3).map(i => {
-                         const p = products.find(prod => prod.id === i.productId);
-                         return p ? p.name : 'Produit';
-                     }).join(', ');
-                     
-                     return `
-                        <div style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 1rem; background: var(--bg-light);">
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                                <div>
-                                    <h4 style="font-weight: 700; margin-bottom: 0.25rem;">Commande ${order.id}</h4>
-                                    <p style="color: var(--text-gray); font-size: 0.9rem;">${Utils.formatDate(order.date)} • ${order.eventLocation}</p>
-                                </div>
-                                <span style="background: #DEF7EC; color: #03543F; padding: 4px 12px; border-radius: var(--radius-full); font-size: 0.85rem; font-weight: 600;">${order.status}</span>
-                            </div>
-                            <div style="margin-bottom: 1rem; font-size: 0.9rem;">
-                                <strong>Articles:</strong> ${previewItems}${order.items.length > 3 ? '...' : ''}
-                            </div>
-                            <div style="font-weight: 700; color: var(--primary-color);">Total: ${Utils.formatCurrency(order.amount)}</div>
-                        </div>
-                     `;
-                 }).join('');
+             // Mobile Dashboard Toggle
+             const dashToggle = document.getElementById('dashboard-toggle');
+             const dashNav = document.getElementById('dashboard-nav');
+             if (dashToggle && dashNav) {
+                 dashToggle.addEventListener('click', () => {
+                     const isHidden = dashNav.style.display === 'none' || dashNav.style.display === '';
+                     dashNav.style.display = isHidden ? 'flex' : 'none';
+                     dashNav.style.flexDirection = 'column';
+                 });
              }
-
-            // Mobile Dashboard Toggle
-            const dashToggle = document.getElementById('dashboard-toggle');
-            const dashNav = document.getElementById('dashboard-nav');
-            if (dashToggle && dashNav) {
-                dashToggle.addEventListener('click', () => {
-                    const isHidden = dashNav.style.display === 'none' || dashNav.style.display === '';
-                    dashNav.style.display = isHidden ? 'flex' : 'none';
-                    dashNav.style.flexDirection = 'column';
-                });
-            }
         });
+
+        function renderClientView(viewName) {
+            const mainContent = document.getElementById('main-content');
+            const template = document.getElementById(`view-${viewName}`);
+            
+            if (!template) return;
+            
+            mainContent.innerHTML = '';
+            mainContent.appendChild(template.content.cloneNode(true));
+
+            const user = Store.getUser();
+            const orders = Store.getUserOrders();
+
+            if (viewName === 'overview') {
+                document.getElementById('welcome-msg').textContent = `Bienvenue, ${user.name} 👋`;
+                document.getElementById('stats-active-count').textContent = orders.filter(o => o.status !== 'Terminé').length;
+                document.getElementById('stats-total-spent').textContent = Utils.formatCurrency(orders.reduce((acc, o) => acc + o.amount, 0));
+                
+                renderOrderList(orders.slice(0, 3), 'recent-orders-list');
+            } else if (viewName === 'reservations') {
+                renderReservations('all');
+            } else if (viewName === 'invoices') {
+                const completedOrders = orders.filter(o => o.status === 'Terminé' || o.status === 'Confirmé');
+                const list = document.getElementById('invoices-list');
+                
+                if (completedOrders.length === 0) {
+                     list.innerHTML = `<div class="text-center" style="padding: 2rem; color: var(--text-gray);"><i class="fas fa-file-invoice" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i><p>Aucune facture disponible.</p></div>`;
+                } else {
+                    list.innerHTML = completedOrders.map(order => `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); margin-bottom: 1rem; background: white;">
+                             <div>
+                                <h4 style="font-weight: 700;">Facture #${order.id}</h4>
+                                <p style="color: var(--text-gray); font-size: 0.9rem;">Date: ${Utils.formatDate(order.date)} • Montant: ${Utils.formatCurrency(order.amount)}</p>
+                             </div>
+                             <button onclick="downloadInvoice('${order.id}')" class="btn btn-sm btn-outline"><i class="fas fa-download"></i> PDF</button>
+                        </div>
+                    `).join('');
+                }
+            } else if (viewName === 'profile') {
+                document.getElementById('profile-name').value = user.name;
+                document.getElementById('profile-email').value = user.email;
+                document.getElementById('profile-phone').value = user.phone || '';
+                
+                document.getElementById('profile-form').onsubmit = (e) => {
+                    e.preventDefault();
+                    user.name = document.getElementById('profile-name').value;
+                    user.phone = document.getElementById('profile-phone').value;
+                    localStorage.setItem(Store.KEYS.USER, JSON.stringify(user));
+                    Utils.showToast('Profil mis à jour !');
+                    document.dispatchEvent(new Event('appReady')); // Refresh header name if needed
+                };
+            }
+        }
+
+        window.renderReservations = (filter) => {
+            const orders = Store.getUserOrders();
+            const filtered = filter === 'all' ? orders : orders.filter(o => o.status === filter);
+            renderOrderList(filtered, 'all-orders-list');
+        };
+
+        function renderOrderList(orders, containerId) {
+            const list = document.getElementById(containerId);
+            const PRODUCTS = Store.getAllProducts();
+
+            if (orders.length === 0) {
+                list.innerHTML = `<div class="text-center" style="padding: 2rem; color: var(--text-gray);"><i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i><p>Aucune réservation trouvée.</p></div>`;
+                return;
+            }
+
+            list.innerHTML = orders.map(order => {
+                const previewItems = order.items.slice(0, 3).map(i => {
+                        const p = PRODUCTS.find(prod => prod.id === i.productId);
+                        return p ? p.name : 'Produit';
+                    }).join(', ');
+                
+                const statusColor = 
+                    order.status === 'En attente' ? 'background: #FEF3C7; color: #92400E;' :
+                    order.status === 'Confirmé' ? 'background: #DEF7EC; color: #03543F;' :
+                    'background: #F3F4F6; color: #1F2937;';
+
+                return `
+                <div style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 1rem; background: var(--bg-light);">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div style="flex: 1; min-width: 0; padding-right: 1rem;">
+                            <h4 style="font-weight: 700; margin-bottom: 0.25rem;">Commande ${order.id}</h4>
+                            <p style="color: var(--text-gray); font-size: 0.9rem;">${Utils.formatDate(order.date)} • ${order.eventLocation}</p>
+                        </div>
+                        <span style="${statusColor} padding: 4px 12px; border-radius: var(--radius-full); font-size: 0.85rem; font-weight: 600;">${order.status}</span>
+                    </div>
+                    <div style="margin-bottom: 1rem; font-size: 0.9rem;">
+                        <strong>Articles:</strong> ${previewItems}${order.items.length > 3 ? '...' : ''}
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                        <div style="font-weight: 700; color: var(--primary-color);">Total: ${Utils.formatCurrency(order.amount)}</div>
+                         ${order.remainingBalance > 0 ? `<span style="font-size: 0.8rem; color: var(--accent-color); white-space: nowrap;">Reste à payer: ${Utils.formatCurrency(order.remainingBalance)}</span>` : ''}
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+        
+        window.downloadInvoice = (id) => {
+            Utils.showToast(`Téléchargement de la facture ${id}...`);
+            setTimeout(() => {
+                alert("Simulation: Le PDF de la facture a été généré et téléchargé.");
+            }, 1000);
+        };
     </script>
 </body>
 </html>

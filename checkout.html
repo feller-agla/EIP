@@ -39,6 +39,34 @@
                             <label class="form-label">Lieu de livraison (Adresse précise)</label>
                             <input type="text" class="form-control" placeholder="Ex: Cotonou, Haie Vive, Rue 123" required id="event-location">
                         </div>
+                        
+                        <!-- Delivery Mode (Persona A/B Gap) -->
+                        <div class="form-group">
+                            <label class="form-label">Mode de Livraison</label>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <input type="radio" name="delivery" value="pickup" checked onchange="updateTotalDisplay()">
+                                        <span>Retrait en Magasin (Gratuit)</span>
+                                    </div>
+                                    <span style="font-weight: 700;">0 F</span>
+                                </label>
+                                <label style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <input type="radio" name="delivery" value="zone1" onchange="updateTotalDisplay()">
+                                        <span>Livraison - Cotonou Centre</span>
+                                    </div>
+                                    <span style="font-weight: 700;">1 000 F</span>
+                                </label>
+                                <label style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <input type="radio" name="delivery" value="zone2" onchange="updateTotalDisplay()">
+                                        <span>Livraison - Calavi / Périphérie</span>
+                                    </div>
+                                    <span style="font-weight: 700;">1 500 F</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
                     <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0;">
@@ -59,6 +87,24 @@
                         </div>
 
                         <div class="form-group">
+                            <label class="form-label">Option de paiement</label>
+                            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                                <label style="flex: 1; border: 1px solid var(--border-color); padding: 1rem; border-radius: var(--radius-md); cursor: pointer; display: flex; flex-direction: column; gap: 0.25rem;" class="payment-type-option">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <input type="radio" name="paymentType" value="full" checked onchange="updateTotalDisplay()">
+                                        <span style="font-weight: 700;">Totalité</span>
+                                    </div>
+                                    <span style="font-size: 0.8rem; color: var(--text-gray); margin-left: 1.5rem;">Payer le montant complet maintenant.</span>
+                                </label>
+                                <label style="flex: 1; border: 1px solid var(--border-color); padding: 1rem; border-radius: var(--radius-md); cursor: pointer; display: flex; flex-direction: column; gap: 0.25rem;" class="payment-type-option">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <input type="radio" name="paymentType" value="deposit" onchange="updateTotalDisplay()">
+                                        <span style="font-weight: 700;">Acompte (30%)</span>
+                                    </div>
+                                    <span style="font-size: 0.8rem; color: var(--text-gray); margin-left: 1.5rem;">Réservez en payant une partie.</span>
+                                </label>
+                            </div>
+
                             <label class="form-label">Numéro de téléphone</label>
                             <input type="tel" class="form-control" placeholder="Ex: 66 12 34 56" required>
                         </div>
