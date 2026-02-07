@@ -71,9 +71,12 @@ function renderProducts() {
                 <div class="product-category">${product.category}</div>
                 <h3 class="product-title"><a href="product-details.html?id=${product.id}">${product.name}</a></h3>
                 <div class="product-price">${Utils.formatCurrency(product.price)} <span>/ jour</span></div>
-                <button class="btn btn-outline btn-sm addToCartBtn" data-id="${product.id}" style="width: 100%; margin-top: auto;">
-                    <i class="fas fa-cart-plus"></i> Ajouter
-                </button>
+                <div style="display: flex; gap: 0.5rem; margin-top: auto;">
+                    <a href="product-details.html?id=${product.id}" class="btn btn-outline btn-sm" style="flex: 1; text-align: center;">Voir</a>
+                    <button class="btn btn-primary btn-sm addToCartBtn" data-id="${product.id}" style="flex: 1;">
+                        <i class="fas fa-cart-plus"></i>
+                    </button>
+                </div>
             </div>
         </div>
     `).join('');

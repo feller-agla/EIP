@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Loueur - EventBenin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Segoe+UI&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Header injected by app.js -->
+
+    <!-- Vendor Profile Header -->
+    <div class="bg-light section" style="padding: 4rem 0 2rem;">
+        <div class="container">
+            <div style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
+                <div style="width: 120px; height: 120px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--primary-color); box-shadow: var(--shadow-md);" id="vendor-avatar">
+                    <i class="fas fa-store"></i>
+                </div>
+                <div>
+                    <h1 class="section-title" id="vendor-name" style="margin-bottom: 0.5rem;">Nom du Loueur</h1>
+                    <div style="color: var(--text-gray); margin-bottom: 1rem;">
+                        <span style="margin-right: 1.5rem;"><i class="fas fa-map-marker-alt"></i> Cotonou, Bénin</span>
+                        <span style="margin-right: 1.5rem;"><i class="fas fa-star text-warning"></i> 4.8/5 (120 avis)</span>
+                        <span><i class="fas fa-check-circle text-success"></i> Identité Vérifiée</span>
+                    </div>
+                    <p id="vendor-bio" style="max-width: 600px;">Chargement...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vendor's Products -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title" style="margin-bottom: 2rem; font-size: 1.5rem;">Catalogue du Loueur</h2>
+            
+            <div id="vendor-products" class="product-grid">
+                <!-- Injected by JS -->
+                <div style="grid-column: 1/-1; text-align: center; padding: 2rem;">Chargement du catalogue...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer injected by app.js -->
+
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/store.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const vendorId = params.get('id');
+            
+            // Mock Vendor Data logic for MVP
+            // IN REAL APP: Fetch vendor info from Store.users
+            const vendorName = document.getElementById('vendor-name');
+            const vendorBio = document.getElementById('vendor-bio');
+            const productGrid = document.getElementById('vendor-products');
+
+            // Default Mock Vendor if not found or generic
+            const mockVendor = {
+                name: "EventPro Locations" + (vendorId ? " " + vendorId : ""),
+                bio: "Spécialiste de la sonorisation et de l'éclairage pour mariages et conférences depuis 10 ans.",
+            };
+
+            vendorName.textContent = mockVendor.name;
+            vendorBio.textContent = mockVendor.bio;
+
+            // Load Products
+            const products = Store.getAllProducts().filter(p => p.vendorId === vendorId || !vendorId); // If no ID, show all (demo) OR filter by specific ID
+            
+            // Refine: if vendorId is specific (e.g. 'vendor1' from mock), filter.
+            // For MVP Data, we need to ensure products HAVE vendorId. 
+            // Currently data.js might need update to ensure coverage.
+            
+            // Let's filter slightly better: if vendorId provided, strict filter. Else show empty state or all.
+            let filteredProducts = products;
+            if (vendorId) {
+                filteredProducts = products.filter(p => p.vendorId === vendorId);
+            }
+
+            if (filteredProducts.length === 0) {
+                productGrid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+                        <i class="fas fa-box-open" style="font-size: 3rem; color: #ddd; margin-bottom: 1rem;"></i>
+                        <h3>Aucun produit trouvé</h3>
+                        <p>Ce loueur n'a pas encore ajouté de produit.</p>
+                    </div>
+                `;
+            } else {
+                productGrid.innerHTML = filteredProducts.map(product => `
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="${product.image}" alt="${product.name}">
+                            ${product.isPopular ? '<span class="badge badge-popular">Populaire</span>' : ''}
+                        </div>
+                        <div class="product-info">
+                            <span class="product-category">${product.category}</span>
+                            <h3>${product.name}</h3>
+                            <div class="product-price">${Utils.formatCurrency(product.price)} / jour</div>
+                            <div class="product-actions">
+                                <a href="product-details.html?id=${product.id}" class="btn btn-outline btn-sm">Voir</a>
+                                <button class="btn btn-primary btn-sm" onclick="Store.addToCart('${product.id}')">Ajouter</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        });
+    </script>
+</body>
+</html>

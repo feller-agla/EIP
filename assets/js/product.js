@@ -27,6 +27,7 @@ function renderProduct(product) {
         <!-- Gallery -->
         <div class="product-gallery" style="background-image: url('${product.image}'); position: relative;">
             ${product.isPopular ? '<span class="product-badge" style="top: 20px; right: 20px; font-size: 1rem;">Populaire</span>' : ''}
+            ${product.stock <= 0 ? '<span class="product-badge" style="top: 20px; left: 20px; background: var(--text-dark); color: white;">Rupture de stock</span>' : ''}
         </div>
 
         <!-- Meta -->
@@ -41,19 +42,25 @@ function renderProduct(product) {
 
             <div style="border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 1.5rem 0;">
                 <p style="color: var(--text-gray); line-height: 1.8;">${product.description}</p>
+                <div style="margin-top: 1rem; font-size: 0.9rem;">
+                    <span style="color: var(--text-gray);">Loué par :</span> 
+                    <a href="profile-loueur.html?id=${product.vendorId || ''}" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">
+                        <i class="fas fa-store"></i> Voir le profil du loueur
+                    </a>
+                </div>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Quantité souhaitée</label>
                 <div style="display: flex; gap: 1rem; align-items: center;">
-                    <div style="display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: var(--radius-md);">
-                        <button class="btn btn-secondary" style="border:none; padding: 0.5rem 1rem;" onclick="updateQty(-1)">-</button>
-                        <input type="number" id="qty-input" value="1" min="1" max="${product.stock}" style="border:none; width: 50px; text-align: center; font-weight: bold;">
-                        <button class="btn btn-secondary" style="border:none; padding: 0.5rem 1rem;" onclick="updateQty(1)">+</button>
+                    <div style="display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: var(--radius-md); opacity: ${product.stock <= 0 ? '0.5' : '1'}">
+                        <button class="btn btn-secondary" style="border:none; padding: 0.5rem 1rem;" onclick="updateQty(-1)" ${product.stock <= 0 ? 'disabled' : ''}>-</button>
+                        <input type="number" id="qty-input" value="1" min="1" max="${product.stock}" style="border:none; width: 50px; text-align: center; font-weight: bold;" ${product.stock <= 0 ? 'disabled' : ''}>
+                        <button class="btn btn-secondary" style="border:none; padding: 0.5rem 1rem;" onclick="updateQty(1)" ${product.stock <= 0 ? 'disabled' : ''}>+</button>
                     </div>
                     
-                    <button class="btn btn-primary" onclick="addToCart('${product.id}')" style="flex: 1; height: 50px;">
-                        <i class="fas fa-cart-plus"></i> Ajouter au Panier
+                    <button class="btn btn-primary" onclick="addToCart('${product.id}')" style="flex: 1; height: 50px;" ${product.stock <= 0 ? 'disabled' : ''}>
+                        <i class="fas fa-cart-plus"></i> ${product.stock > 0 ? 'Ajouter au Panier' : 'Indisponible'}
                     </button>
                 </div>
                 <div class="mt-1" style="font-size: 0.85rem; color: var(--text-gray);">Total: <span id="total-price" style="font-weight:700; color: var(--text-dark)">${Utils.formatCurrency(product.price)}</span></div>
@@ -71,6 +78,29 @@ function renderProduct(product) {
 
     // Initialize total price calculation var
     window.currentBasePrice = product.price;
+
+    renderReviews(product);
+}
+
+function renderReviews(product) {
+    const container = document.getElementById('product-reviews');
+    if (!product.reviews || product.reviews.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-gray); font-style: italic;">Aucun avis pour ce produit pour le moment.</p>';
+        return;
+    }
+
+    container.innerHTML = product.reviews.map(review => `
+        <div style="background: white; padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-weight: 700;">${review.user}</span>
+                <div style="color: #FCD116;">
+                    ${'<i class="fas fa-star"></i>'.repeat(review.rating)}
+                    ${'<i class="far fa-star"></i>'.repeat(5 - review.rating)}
+                </div>
+            </div>
+            <p style="color: var(--text-gray);">${review.comment}</p>
+        </div>
+    `).join('');
 }
 
 // Global scope for onclick handlers (simpler than event delegation for this specific layout)

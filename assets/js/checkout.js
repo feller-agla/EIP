@@ -15,7 +15,44 @@ document.addEventListener('DOMContentLoaded', () => {
     renderOrderSummary();
 
     document.getElementById('checkout-form').addEventListener('submit', handlePayment);
+    
+    // Initial calc
+    updateTotalDisplay();
 });
+
+window.currentCartTotal = 0;
+
+function getShippingCost() {
+    const delivery = document.querySelector('input[name="delivery"]:checked');
+    if (!delivery) return 0;
+    
+    if (delivery.value === 'zone1') return 1000;
+    if (delivery.value === 'zone2') return 1500;
+    return 0; // pickup
+}
+
+function updateTotalDisplay() {
+    const paymentType = document.querySelector('input[name="paymentType"]:checked').value;
+    const cartTotal = window.currentCartTotal;
+    const shipping = getShippingCost();
+    
+    const grandTotal = cartTotal + shipping;
+    
+    // Update labels in summary if exists
+    const shippingLabel = document.getElementById('summary-shipping');
+    if (shippingLabel) shippingLabel.textContent = Utils.formatCurrency(shipping);
+
+    const totalLabel = document.getElementById('checkout-total');
+    if (totalLabel) totalLabel.textContent = Utils.formatCurrency(grandTotal);
+
+    let amountToPay = grandTotal;
+    if (paymentType === 'deposit') {
+        amountToPay = grandTotal * 0.3;
+    }
+    
+    document.getElementById('pay-amount').textContent = Utils.formatCurrency(amountToPay);
+}
+
 
 function renderOrderSummary() {
     const items = Store.getCart();
@@ -44,9 +81,26 @@ function renderOrderSummary() {
         `;
     }).join('');
 
-    const formattedTotal = Utils.formatCurrency(total);
-    document.getElementById('checkout-total').textContent = formattedTotal;
-    document.getElementById('pay-amount').textContent = formattedTotal;
+    window.currentCartTotal = total;
+    
+    // Append Shipping Line
+    const summaryContainer = document.getElementById('checkout-items').parentNode;
+    let shippingRow = document.getElementById('shipping-row');
+    if (!shippingRow) {
+        shippingRow = document.createElement('div');
+        shippingRow.id = 'shipping-row';
+        shippingRow.style.display = 'flex';
+        shippingRow.style.justifyContent = 'space-between';
+        shippingRow.style.marginBottom = '0.5rem';
+        shippingRow.style.marginTop = '1rem';
+        shippingRow.style.fontSize = '0.9rem';
+        shippingRow.innerHTML = `<span>Livraison</span><span id="summary-shipping">0 F</span>`;
+        // Insert before total border
+        const totalBorder = summaryContainer.children[summaryContainer.children.length - 1];
+        summaryContainer.insertBefore(shippingRow, totalBorder);
+    }
+
+    updateTotalDisplay();
 }
 
 function handlePayment(e) {
@@ -60,15 +114,33 @@ function handlePayment(e) {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Traitement...';
 
     setTimeout(() => {
-        // Create Order
         const date = document.getElementById('event-date').value;
         const location = document.getElementById('event-location').value;
+        const paymentType = document.querySelector('input[name="paymentType"]:checked').value;
+        const deliveryMode = document.querySelector('input[name="delivery"]:checked').value;
         
+        const cartTotal = Store.getCartTotal();
+        const shipping = getShippingCost();
+        const grandTotal = cartTotal + shipping;
+        
+        let amountPaid = grandTotal;
+        let remaining = 0;
+        
+        if (paymentType === 'deposit') {
+            amountPaid = grandTotal * 0.3;
+            remaining = grandTotal - amountPaid;
+        }
+
         const order = Store.createOrder({
             eventDate: date,
             eventLocation: location,
             items: Store.getCart(),
-            amount: Store.getCartTotal()
+            amount: grandTotal, 
+            paymentType: paymentType,
+            deliveryMode: deliveryMode,
+            shippingCost: shipping,
+            paidAmount: amountPaid,
+            remainingBalance: remaining
         });
 
         // Show Success and Redirect
