@@ -249,7 +249,7 @@ img {
 .nav-collapse {
     display: flex;
     align-items: center;
-    justify-content: flex-end; /* Push Actions to the Right */
+    justify-content: space-between;
     flex: 1;
 }
 
@@ -257,11 +257,7 @@ img {
     display: flex;
     gap: 2rem;
     align-items: center;
-    /* True Center via Absolute Positioning */
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    margin: 0;
+    margin: 0 auto; /* True Center */
 }
 
 .nav-link {
@@ -271,37 +267,6 @@ img {
     position: relative;
     padding: 0.5rem 0;
 }
-
-/* ... existing styles ... */
-
-@media (max-width: 768px) {
-    .mobile-toggle { display: block; }
-    
-    .nav-collapse {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        background: white;
-        flex-direction: column;
-        padding: 1rem;
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-        border-top: 1px solid var(--border-color);
-        gap: 1rem;
-        /* Reset justify for mobile */
-        justify-content: flex-start;
-    }
-
-    .nav-menu {
-        flex-direction: column;
-        gap: 0;
-        margin: 0; 
-        /* Reset Absolute for Mobile */
-        position: static;
-        transform: none;
-        width: 100%;
-    }
 
 .nav-link:hover, .nav-link.active {
     color: var(--primary-color);
