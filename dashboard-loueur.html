@@ -4,11 +4,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tableau de Bord Loueur - EventBenin</title>
+    <title>Tableau de Bord Loueur v2.1 - EventBenin</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Segoe+UI&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=2">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Custom enhancements for dashboard forms */
+        .form-control {
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 135, 81, 0.1);
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            background: #f9fafb;
+            border: 2px dashed #e5e7eb;
+            border-radius: var(--radius-md);
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-wrapper:hover {
+            border-color: var(--primary-color);
+            background: #f0fdf4;
+        }
+    </style>
 </head>
 
 <body class="bg-light">
@@ -445,7 +472,13 @@
                     });
 
                     if (!uploadRes.ok) {
-                        throw new Error("Erreur lors de l'upload de l'image");
+                        if (uploadRes.status === 401) {
+                            alert("Votre session a expiré. Veuillez vous reconnecter.");
+                            Store.logout();
+                            return;
+                        }
+                        const errData = await uploadRes.json().catch(() => ({ error: uploadRes.statusText }));
+                        throw new Error(`Erreur upload: ${errData.error || uploadRes.statusText}`);
                     }
                     const uploadJson = await uploadRes.json();
                     imageUrl = uploadJson.url;
@@ -522,7 +555,10 @@
             if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin"></i> Chargement...</td></tr>';
 
             const allOrders = await Store.getVendorOrders();
-            const products = await Store.getAllProducts();
+            await Store.fetchProducts(); // Ensure fresh data
+            const products = Store.getAllProducts();
+            const user = Store.getUser();
+            const myProducts = products.filter(p => p.vendor_id === user.id);
 
             // Calcs
             let totalRevenue = 0;
@@ -538,7 +574,7 @@
 
             if (document.getElementById('stats-revenue')) document.getElementById('stats-revenue').textContent = Utils.formatCurrency(totalRevenue);
             if (document.getElementById('stats-res-count')) document.getElementById('stats-res-count').textContent = totalRes;
-            if (document.getElementById('stats-products')) document.getElementById('stats-products').textContent = products.length;
+            if (document.getElementById('stats-products')) document.getElementById('stats-products').textContent = myProducts.length;
 
             // Table
             // Re-grab tbody in case view changed, though we are in renderOverview

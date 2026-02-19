@@ -1952,3 +1952,58 @@ textarea.form-control {
         grid-template-columns: 1fr;
     }
 }
+/* Dashboard Form Enhancements */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--text-dark);
+    background-color: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease-in-out;
+    box-shadow: var(--shadow-sm);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 135, 81, 0.15);
+}
+
+/* File Upload Enhancement */
+input[type="file"].form-control {
+    padding: 0.75rem;
+    background-color: #f9fafb;
+    border: 2px dashed var(--border-color);
+    cursor: pointer;
+}
+
+input[type="file"].form-control:hover {
+    background-color: #f0fdf4;
+    border-color: var(--primary-color);
+}
+
+/* Delete Button */
+.btn-delete {
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.btn-delete:hover {
+    background-color: var(--accent-color);
+    color: white;
+}
