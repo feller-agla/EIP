@@ -11,18 +11,26 @@ L'application repose sur une architecture decouplee :
 
 ## Configuration et Lancement
 
-Le projet necessite deux serveurs actifs pour un fonctionnement complet.
+### 1. Démarrer le Backend (Port 4000)
+Le backend gère l'API et sert également les fichiers statiques du frontend.
 
-### Backend (Port 4000)
-Le serveur backend gere les communications securisees avec Supabase.
-1. Acceder au dossier : cd backend
-2. Installer les dependances : npm install
-3. Lancer le serveur : node index.js
-Le fichier .env doit contenir les variables SUPABASE_URL et SUPABASE_ANON_KEY.
+```bash
+cd backend
+npm install
+node index.js
+```
+Le serveur sera accessible sur `http://localhost:4000`.
 
-### Frontend (Port 4001)
-Le frontend peut etre servi par n'importe quel serveur statique. Pour les tests, le port 4001 est recommande.
-Exemple avec npx : npx serve frontend -l 4001
+### 2. Démarrer le Frontend (Développement / Standalone)
+Si vous souhaitez lancer le frontend séparément (par exemple pour le développement avec `npx serve`) :
+
+```bash
+cd frontend
+npx serve .
+```
+Par défaut, cela sera accessible sur `http://localhost:3000`.
+
+**Note :** Le backend (port 4000) sert aussi le frontend. Vous pouvez donc simplement lancer le backend et accéder à `http://localhost:4000`.
 
 ## Authentification et Roles
 
