@@ -177,6 +177,7 @@
                             <th>Prix / Jour</th>
                             <th>Stock Total</th>
                             <th>Dispo. Aujourd'hui</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="products-table"></tbody>
@@ -223,6 +224,10 @@
                             <option value="lumiere">Lumière</option>
                             <option value="mobilier">Mobilier</option>
                             <option value="packs">Packs</option>
+                            <option value="tentes">Tentes & Chapiteaux</option>
+                            <option value="eclairage">Éclairage</option>
+                            <option value="decoration">Décoration</option>
+                            <option value="energie">Énergie</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -237,8 +242,9 @@
                         <input type="number" class="form-control" name="stock" required min="1" value="1">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Image (URL)</label>
-                        <input type="url" class="form-control" name="image" required placeholder="https://...">
+                        <label class="form-label">Image du produit</label>
+                        <input type="file" class="form-control" name="image" accept="image/*" required>
+                        <small style="color: grey;">Upload vers Supabase Storage</small>
                     </div>
                 </div>
 
@@ -248,7 +254,8 @@
                 </div>
 
                 <div style="text-align: right; margin-top: 1rem;">
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Créer le produit</button>
+                    <button type="submit" class="btn btn-primary" id="btn-add-prod"><i class="fas fa-plus"></i> Créer le
+                        produit</button>
                 </div>
             </form>
         </div>
@@ -409,24 +416,69 @@
 
         window.handleAddProduct = async (e) => {
             e.preventDefault();
-            const formData = new FormData(e.target);
-            const product = {
-                name: formData.get('name'),
-                category: formData.get('category'),
-                price: parseInt(formData.get('price')),
-                stock: parseInt(formData.get('stock')),
-                image: formData.get('image'),
-                description: formData.get('description'),
-                isPopular: false, // Default
-                reviews: [],
-                vendorId: Store.getUser()?.id
-            };
+            const form = e.target;
+            const btn = form.querySelector('#btn-add-prod');
+            const originalBtnText = btn.innerHTML;
 
-            const newProduct = await Store.addProduct(product);
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
+            btn.disabled = true;
 
-            if (newProduct) {
-                Utils.showToast('Produit ajouté avec succès !');
-                renderLoueurView('products'); // Switch to products view
+            try {
+                const formData = new FormData(form);
+                const fileInput = form.querySelector('input[type="file"]');
+                let imageUrl = '';
+
+                // 1. Upload Image
+                if (fileInput.files.length > 0) {
+                    const uploadData = new FormData();
+                    uploadData.append('file', fileInput.files[0]);
+
+                    const session = Store.getSession();
+                    const token = session ? session.access_token : null;
+
+                    const uploadRes = await fetch('http://localhost:4000/api/upload', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: uploadData
+                    });
+
+                    if (!uploadRes.ok) {
+                        throw new Error("Erreur lors de l'upload de l'image");
+                    }
+                    const uploadJson = await uploadRes.json();
+                    imageUrl = uploadJson.url;
+                }
+
+                // 2. Create Product
+                const product = {
+                    name: formData.get('name'),
+                    category: formData.get('category'),
+                    price: parseInt(formData.get('price')),
+                    stock: parseInt(formData.get('stock')),
+                    image: imageUrl,
+                    description: formData.get('description'),
+                    isPopular: false,
+                    reviews: [],
+                    vendorId: Store.getUser()?.id
+                };
+
+                const newProduct = await Store.addProduct(product);
+
+                if (newProduct) {
+                    Utils.showToast('Produit ajouté avec succès !');
+                    renderLoueurView('products');
+                } else {
+                    Utils.showToast("Erreur lors de la création du produit", "error");
+                }
+
+            } catch (err) {
+                console.error(err);
+                Utils.showToast(err.message || "Une erreur est survenue", "error");
+            } finally {
+                btn.innerHTML = originalBtnText;
+                btn.disabled = false;
             }
         };
 
@@ -572,10 +624,22 @@
                                 ${available}
                             </span>
                         </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline" style="color: red; border-color: red;" onclick="handleDeleteProduct('${p.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
                     </tr>
                 `;
             }).join('');
         }
+
+        window.handleDeleteProduct = async (id) => {
+            const success = await Store.deleteProduct(id);
+            if (success) {
+                renderLoueurView('products');
+            }
+        };
 
         async function renderCalendar() {
             const tbody = document.getElementById('calendar-table');

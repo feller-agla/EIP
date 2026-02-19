@@ -96,6 +96,45 @@ const Store = {
         }
     },
 
+    deleteProduct: async (id) => {
+        try {
+            const session = Store.getSession();
+            const token = session ? session.access_token : null;
+
+            if (!token) {
+                alert("Vous devez être connecté pour supprimer un produit.");
+                return false;
+            }
+
+            if (!confirm("Voulez-vous vraiment supprimer ce produit ? Cette action est irréversible.")) {
+                return false;
+            }
+
+            const response = await fetch(`http://localhost:4000/api/products/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                // Update local storage
+                let products = Store.getAllProducts();
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem(Store.KEYS.PRODUCTS, JSON.stringify(products));
+                if (window.Utils && Utils.showToast) Utils.showToast("Produit supprimé avec succès.");
+                return true;
+            } else {
+                const err = await response.json();
+                alert(`Erreur: ${err.error}`);
+                return false;
+            }
+        } catch (error) {
+            console.error('API Error:', error);
+            return false;
+        }
+    },
+
     // Check availability for a specific date range (basic implementation: per single date)
     checkStock: (productId, date, quantity) => {
         const product = Store.getProductById(productId);

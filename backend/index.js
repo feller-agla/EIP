@@ -31,6 +31,10 @@ app.use('/api/products', productRoutes);
 const orderRoutes = require('./routes/orders')(supabase);
 app.use('/api/orders', orderRoutes);
 
+// Import and use upload routes
+const uploadRoutes = require('./routes/upload')(supabase);
+app.use('/api/upload', uploadRoutes);
+
 // Serve static files from the 'frontend' directory
 app.use(express.static(path.join(__dirname, '../frontend')));
 
