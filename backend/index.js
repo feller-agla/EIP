@@ -23,6 +23,14 @@ app.use(express.json());
 const authRoutes = require('./routes/auth')(supabase); // Pass supabase client
 app.use('/api/auth', authRoutes);
 
+// Import and use product routes
+const productRoutes = require('./routes/products')(supabase);
+app.use('/api/products', productRoutes);
+
+// Import and use order routes
+const orderRoutes = require('./routes/orders')(supabase);
+app.use('/api/orders', orderRoutes);
+
 // Serve static files from the 'frontend' directory
 app.use(express.static(path.join(__dirname, '../frontend')));
 
