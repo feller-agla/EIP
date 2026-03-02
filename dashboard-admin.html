@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord Admin - EventBenin</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Segoe+UI&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="bg-light">
+
+    <!-- Top Navbar -->
+    <nav class="navbar" style="position: sticky; top: 0; z-index: 100;">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <a href="index.html" class="logo">
+                <i class="fas fa-layer-group"></i> EventBenin<span style="color:var(--secondary-color)">.</span> Admin
+            </a>
+            <div id="user-menu" style="display: flex; align-items: center; gap: 1rem;">
+                <!-- Profile dropdown will be injected here if needed, or simple logout -->
+                <button class="btn btn-outline btn-sm" onclick="App.logout()">Déconnexion</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Layout -->
+    <div class="container" style="display: flex; gap: 2rem; margin-top: 2rem;">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-menu">
+                <a href="#" class="sidebar-link active" onclick="alert('Module Analytics Actif')"><i
+                        class="fas fa-chart-line"></i> Analytics (Clarity)</a>
+                <a href="#" class="sidebar-link" onclick="alert('En cours de développement')"><i
+                        class="fas fa-users"></i> Utilisateurs</a>
+                <a href="#" class="sidebar-link" onclick="alert('En cours de développement')"><i class="fas fa-box"></i>
+                    Tous les Produits</a>
+                <a href="#" class="sidebar-link" onclick="alert('En cours de développement')"><i
+                        class="fas fa-file-invoice-dollar"></i> Transactions</a>
+            </div>
+
+            <div style="margin-top: auto; padding-top: 2rem;">
+                <a href="#" class="sidebar-link text-danger" onclick="App.logout()">
+                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-content">
+            <h2 class="section-title" style="font-size: 1.5rem; margin-bottom: 1.5rem;">Aperçu des performances
+                (Clarity)</h2>
+
+            <!-- Analytics Stats Grid -->
+            <div class="stats-grid" id="clarity-stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div>
+                        <div class="stat-value" id="clarity-sessions">--</div>
+                        <div class="stat-label">Sessions Actives</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-mouse-pointer"></i></div>
+                    <div>
+                        <div class="stat-value" id="clarity-clicks">--</div>
+                        <div class="stat-label">Clics de Frustration</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    <div>
+                        <div class="stat-value" id="clarity-duration">--</div>
+                        <div class="stat-label">Temps Moyen (s)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Insights Table -->
+            <div
+                style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--border-color); padding: 1.5rem; margin-top: 2rem;">
+                <h3 style="font-weight: 700; margin-bottom: 1rem;">Pages les plus visitées</h3>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>URL / Page</th>
+                                <th>Vues</th>
+                                <th>Taux de Rebond</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clarity-pages-table">
+                            <tr>
+                                <td colspan="3" class="text-center"><i class="fas fa-spinner fa-spin"></i> Chargement
+                                    des données Clarity API...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div
+                style="margin-top: 2rem; padding: 1rem; background: #E8F4FD; border-left: 4px solid var(--primary-color); border-radius: 4px;">
+                <i class="fas fa-info-circle" style="color: var(--primary-color); margin-right: 0.5rem;"></i>
+                <strong>Note :</strong> Ces données proviennent en direct de l'API Microsoft Clarity associée à votre
+                projet. L'export se fait via le token JWT du `.env`.
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/store.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check auth manually
+            const session = Store.getSession();
+            const user = Store.getUser();
+
+            if (!session || !user) {
+                window.location.replace('connexion.html');
+                return;
+            }
+
+            if (user.user_metadata?.user_type !== 'admin' && user.user_metadata?.role !== 'admin' && user.role !== 'admin') {
+                alert("Accès refusé. Réservé aux administrateurs.");
+                window.location.replace('index.html');
+                return;
+            }
+
+            // Fetch Clarity data
+            try {
+                const res = await fetch('http://localhost:4000/api/admin/clarity-insights', {
+                    headers: {
+                        'Authorization': `Bearer ${session.access_token}`
+                    }
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    renderClarityData(data);
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    document.getElementById('clarity-pages-table').innerHTML = `<tr><td colspan="3" class="text-center" style="color:red;">Erreur: ${err.error || res.statusText}</td></tr>`;
+                }
+            } catch (err) {
+                console.error("Fetch error:", err);
+                document.getElementById('clarity-pages-table').innerHTML = `<tr><td colspan="3" class="text-center" style="color:red;">Erreur de connexion au serveur backend.</td></tr>`;
+            }
+        });
+
+        function renderClarityData(data) {
+            // The structure of 'data' depends entirely on Microsoft Clarity's response format.
+            // Assuming a typical structure for demonstration purposes since live endpoints vary.
+            // Example structure: { metrics: { sessions: 154, deadClicks: 12, avgDuration: 145 }, topPages: [...] }
+
+            // For now, if API works but we don't know the exact structure, we just print the raw obj or extract common fields
+            const parseMetric = (val) => val !== undefined ? val : '--';
+
+            // Update stats
+            document.getElementById('clarity-sessions').textContent = parseMetric(data.metrics?.sessions || data.sessionsCount || data.totalSessions);
+            document.getElementById('clarity-clicks').textContent = parseMetric(data.metrics?.frustrationClicks || data.metrics?.deadClicks || '--');
+            document.getElementById('clarity-duration').textContent = parseMetric(data.metrics?.avgSessionDuration || '--');
+
+            const tbody = document.getElementById('clarity-pages-table');
+            const pages = data.topPages || data.pages || [];
+
+            if (pages.length === 0) {
+                // If it's just raw unstructured JSON or an array, we might handle it differently.
+                tbody.innerHTML = `<tr><td colspan="3"><pre style="font-size: 0.8rem;">${JSON.stringify(data, null, 2).substring(0, 500)}...</pre></td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = pages.map(p => `
+                <tr>
+                    <td style="font-weight: 500;">${p.url || p.path || 'Inconnu'}</td>
+                    <td>${p.views || p.sessions || 0}</td>
+                    <td>${p.bounceRate ? p.bounceRate + '%' : '--'}</td>
+                </tr>
+            `).join('');
+        }
+    </script>
+</body>
+
+</html>

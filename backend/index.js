@@ -35,6 +35,10 @@ app.use('/api/orders', orderRoutes);
 const uploadRoutes = require('./routes/upload')(supabase);
 app.use('/api/upload', uploadRoutes);
 
+// Import and use clarity admin routes
+const clarityRoutes = require('./routes/clarity')(supabase);
+app.use('/api/admin', clarityRoutes);
+
 // Serve static files from the 'frontend' directory
 app.use(express.static(path.join(__dirname, '../frontend')));
 

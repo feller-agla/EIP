@@ -1,21 +1,25 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion - EventBenin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Outfit:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Microsoft Clarity -->
     <script type="text/javascript">
-        (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        (function (c, l, a, r, i, t, y) {
+            c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+            t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+            y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
         })(window, document, "clarity", "script", "vpf22vkhh5");
     </script>
 </head>
+
 <body class="auth-v2-body">
 
     <div class="auth-v2-container">
@@ -26,7 +30,7 @@
 
         <!-- Glass Card -->
         <div class="glass-card">
-            
+
             <!-- Auth Tabs -->
             <div class="auth-tabs">
                 <button class="auth-tab active" onclick="switchTab('client')">
@@ -101,14 +105,14 @@
             console.warn("App.js might not be fully initialized. Ensure it's loaded before this script.");
         }
         Store.init();
-        
+
         // Initial State
         let currentRole = 'client';
 
         function switchTab(role) {
             currentRole = role;
             document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
-            
+
             if (role === 'client') {
                 document.querySelector('.auth-tab:first-child').classList.add('active');
                 document.getElementById('auth-title').textContent = "Espace Client";
@@ -150,21 +154,23 @@
 
                 if (response.ok) {
                     console.log('Login success, user data:', data.user);
-                    
+
                     // S'assurer que les données sont stockées AVANT la redirection
                     localStorage.setItem('eventbenin_user', JSON.stringify(data.user));
                     localStorage.setItem('eventbenin_session', JSON.stringify(data.session));
 
                     const metadata = data.user.user_metadata || {};
                     const userRole = metadata.user_type || 'client';
-                    
+
                     App.showToast('Connexion réussie !', 'success');
-                    
+
                     // Alerte pour confirmer le rôle enregistré en base
                     alert("Rôle détecté pour ce compte : " + userRole.toUpperCase());
 
                     setTimeout(() => {
-                        if (userRole === 'loueur') {
+                        if (userRole === 'admin') {
+                            window.location.replace('dashboard-admin.html');
+                        } else if (userRole === 'loueur') {
                             window.location.replace('dashboard-loueur.html');
                         } else {
                             window.location.replace('dashboard-client.html');
@@ -202,4 +208,5 @@
         // switchTab('client'); // Default
     </script>
 </body>
+
 </html>
