@@ -39,6 +39,10 @@ app.use('/api/upload', uploadRoutes);
 const clarityRoutes = require('./routes/clarity')(supabase);
 app.use('/api/admin', clarityRoutes);
 
+// Import and use tracking routes (clicks + PMF)
+const trackRoutes = require('./routes/track')(supabase);
+app.use('/api/track', trackRoutes);
+
 // Serve static files from the 'frontend' directory
 app.use(express.static(path.join(__dirname, '../frontend')));
 

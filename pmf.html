@@ -16,7 +16,7 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <style>
         .pmf-container {
             max-width: 1200px;
@@ -27,17 +27,17 @@
             box-shadow: var(--shadow-md);
             overflow-x: auto;
         }
-        
+
         .pmf-header {
             text-align: center;
             margin-bottom: 2rem;
         }
-        
+
         .pmf-header h1 {
             color: var(--primary-color);
             margin-bottom: 0.5rem;
         }
-        
+
         .pmf-subtitle {
             font-size: 1.1rem;
             color: var(--text-gray);
@@ -69,28 +69,29 @@
             font-size: 0.9rem;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
-        .cohort-table th, .cohort-table td {
+
+        .cohort-table th,
+        .cohort-table td {
             padding: 0.8rem 0.5rem;
             border: 1px solid #e0e0e0;
         }
-        
+
         .cohort-table th {
             background-color: #f8f9fa;
             font-weight: 700;
             color: #333;
         }
-        
+
         .cohort-table td {
             font-weight: 600;
             color: #fff;
-            text-shadow: 0px 0px 2px rgba(0,0,0,0.2);
+            text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        
+
         .cohort-table td:hover {
             transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             z-index: 10;
             position: relative;
         }
@@ -117,6 +118,7 @@
             box-shadow: none !important;
             cursor: default;
         }
+
         .cell-empty:hover {
             transform: none !important;
             box-shadow: none !important;
@@ -131,11 +133,13 @@
             margin-top: 2rem;
             font-size: 0.9rem;
         }
+
         .legend-item {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
+
         .legend-color {
             width: 20px;
             height: 20px;
@@ -169,14 +173,15 @@
             <div class="pmf-container">
                 <div class="pmf-header">
                     <h1>Cohortes & Rétention</h1>
-                    <p class="pmf-subtitle">Suivi hebdomadaire de l'engagement des utilisateurs pour valider notre Product-Market Fit.</p>
+                    <p class="pmf-subtitle">Suivi hebdomadaire de l'engagement des utilisateurs pour valider notre
+                        Product-Market Fit.</p>
                 </div>
 
                 <div class="pmf-indicator-box">
                     <h3>💡 Notre Définition du Product-Market Fit</h3>
                     <p style="font-size: 1.05rem; line-height: 1.5;">
-                        <strong>Indicateur clé :</strong> Le PMF est atteint (« True ») si 
-                        <span style="color: var(--success-color); font-weight: bold; font-size: 1.1rem;">70%</span> 
+                        <strong>Indicateur clé :</strong> Le PMF est atteint (« True ») si
+                        <span style="color: var(--success-color); font-weight: bold; font-size: 1.1rem;">70%</span>
                         des utilisateurs inscrits sur la plateforme cliquent sur au moins un article par semaine.
                     </p>
                 </div>
@@ -184,7 +189,7 @@
                 <div style="font-style: italic; color: #666; margin-bottom: 0.5rem; text-align: center;">
                     Pourcentage d'utilisateurs atteignant l'indicateur d'engagement hebdomadaire
                 </div>
-                
+
                 <table class="cohort-table" id="cohort-table">
                     <thead>
                         <tr>
@@ -211,11 +216,21 @@
 
                 <div class="legend">
                     <span style="font-weight: 600; margin-right: 1rem;">Légende :</span>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #f77b72;"></div> &lt; 20%</div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #f6ad55;"></div> 20% - 40%</div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #fceea7;"></div> 40% - 60%</div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #a7fca9;"></div> 60% - 70%</div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #48bb78;"></div> &ge; 70% (Objectif)</div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #f77b72;"></div> &lt; 20%
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #f6ad55;"></div> 20% - 40%
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #fceea7;"></div> 40% - 60%
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #a7fca9;"></div> 60% - 70%
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #48bb78;"></div> &ge; 70% (Objectif)
+                    </div>
                 </div>
 
             </div>
@@ -226,124 +241,105 @@
     <script src="assets/js/utils.js"></script>
     <script src="assets/js/store.js"></script>
     <script src="assets/js/app.js"></script> <!-- for nav -->
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const tbody = document.getElementById('cohort-body');
 
-            // Function to map percentage to a heat color
             function getHeatColor(percent) {
                 if (percent === null || percent === undefined) return '';
-                
-                if (percent < 20) return '#f77b72'; // Red
-                if (percent < 40) return '#f6ad55'; // Orange
-                if (percent < 55) return '#fceea7'; // Light Yellow
-                if (percent < 60) return '#e2f094'; // Yellow-Green
-                if (percent < 70) return '#a7fca9'; // Light Green
-                return '#48bb78'; // Dark Green (>= 70%)
+                if (percent < 20) return '#f77b72';
+                if (percent < 40) return '#f6ad55';
+                if (percent < 55) return '#fceea7';
+                if (percent < 60) return '#e2f094';
+                if (percent < 70) return '#a7fca9';
+                return '#48bb78';
             }
 
-            // Render table
             function renderTable(data) {
-                tbody.innerHTML = ''; // clear loading
-                
+                tbody.innerHTML = '';
                 if (!data || data.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="14" style="padding: 2rem;">Aucune donnée de cohorte disponible.</td></tr>';
                     return;
                 }
-
                 data.forEach(row => {
                     const tr = document.createElement('tr');
-                    
                     const tdAcquired = document.createElement('td');
                     tdAcquired.textContent = row.acquired;
                     tdAcquired.className = 'col-users';
                     tr.appendChild(tdAcquired);
-                    
                     const tdWeek = document.createElement('td');
                     tdWeek.textContent = row.week;
                     tdWeek.className = 'col-week';
                     tr.appendChild(tdWeek);
-                    
                     for (let i = 0; i < 12; i++) {
                         const td = document.createElement('td');
                         const val = row.values[i];
-                        
                         if (val !== undefined && val !== null) {
                             td.textContent = val + '%';
                             td.style.backgroundColor = getHeatColor(val);
-                            if (val >= 40 && val < 70) {
-                                td.style.color = '#333';
-                                td.style.textShadow = 'none';
-                            }
+                            if (val >= 40 && val < 70) { td.style.color = '#333'; td.style.textShadow = 'none'; }
                         } else {
-                            td.className = 'cell-empty';
+                            td.textContent = '…%';
+                            td.style.backgroundColor = '#f0f0f0';
+                            td.style.color = '#aaa';
+                            td.style.fontWeight = '400';
                         }
                         tr.appendChild(td);
                     }
-                    
                     tbody.appendChild(tr);
                 });
             }
 
-            // Initial loading state
-            tbody.innerHTML = '<tr><td colspan="14" style="padding: 2rem;"><i class="fas fa-spinner fa-spin"></i> Chargement des données Clarity...</td></tr>';
-
-            try {
-                // We need an admin token to call this API.
-                const token = localStorage.getItem('access_token');
-                
-                // Si on n'est pas connecté, on simule une structure vide avec des 0
-                if (!token) {
-                    console.warn("Utilisateur non authentifié, affichage de données à 0.");
-                    renderEmptyCohorts();
-                    return;
-                }
-
-                const response = await fetch('http://localhost:5000/api/admin/clarity-insights', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (response.ok) {
-                    const clarityData = await response.json();
-                    
-                    // TODO: Microsoft Clarity Live Insights ne renvoie pas naturellement un tableau de cohorte.
-                    // Il faut normalement agréger les données (ex: "click" events de custom tags).
-                    // Pour le moment on mock avec des 0 basés sur la structure puisque l'API renvoie autre chose
-                    // et que vous avez demandé d'afficher "0" si pas de vraies données.
-                    
-                    console.log("Données brutes Clarity:", clarityData);
-                    
-                    // Si on arrive à extraire les cohortes depuis clarityData, on le fera ici.
-                    // Actuellement, on remplit tout à 0% en attendant l'implémentation complète des events Clarity PMF.
-                    renderEmptyCohorts();
-
-                } else {
-                    console.error('Erreur API Clarity:', response.status);
-                    renderEmptyCohorts();
-                }
-
-            } catch (error) {
-                console.error("Impossible de joindre le backend:", error);
-                renderEmptyCohorts();
-            }
-
-            // Fonction pour générer un tableau vide (0%)
-            function renderEmptyCohorts() {
-                // Structure de base pour 12 semaines avec des valeurs à 0.
-                const emptyCohortData = Array.from({ length: 12 }, (_, index) => {
-                    const values = Array(12 - index).fill(0); // Rempli de 0% jusqu'à la semaine courante relative
-                    return {
-                        acquired: 0,
-                        week: `Semaine ${String(index + 1).padStart(2, '0')}`,
-                        values: values
-                    };
-                });
+            function renderEmptyCohorts(userCount = 0) {
+                const emptyCohortData = Array.from({ length: 12 }, (_, index) => ({
+                    acquired: index === 0 ? userCount : 0,
+                    week: `Semaine ${String(index + 1).padStart(2, '0')}`,
+                    values: Array(12 - index).fill(null)  // null = ...%
+                }));
                 renderTable(emptyCohortData);
             }
 
+            tbody.innerHTML = '<tr><td colspan="14" style="padding: 2rem;"><i class="fas fa-spinner fa-spin"></i> Chargement des données...</td></tr>';
+
+            // Récupérer la session depuis Store
+            const session = Store.getSession();
+            const user = Store.getUser();
+
+            if (!session || !user || user.user_metadata?.user_type !== 'admin') {
+                console.warn('Non-admin or not logged in. Displaying empty cohorts.');
+                renderEmptyCohorts();
+                return;
+            }
+
+            const token = session.access_token;
+
+            try {
+                const response = await fetch('http://localhost:4000/api/track/pmf-cohorts', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.missingTable) {
+                        const msg = document.createElement('div');
+                        msg.style = 'background:#fff3cd;border:1px solid #ffc107;padding:1rem;border-radius:8px;margin-bottom:1rem;font-size:0.9rem;';
+                        msg.innerHTML = '⚠️ <strong>Table manquante :</strong> Exécutez <code>backend/db/product_clicks.sql</code> dans Supabase SQL Editor pour activer le tracking.';
+                        document.querySelector('.pmf-container').insertBefore(msg, document.getElementById('cohort-table'));
+                        renderEmptyCohorts();
+                    } else if (data.cohorts && data.cohorts.length > 0) {
+                        renderTable(data.cohorts);
+                    } else {
+                        renderEmptyCohorts();
+                    }
+                } else {
+                    console.error('Erreur API PMF:', response.status);
+                    renderEmptyCohorts();
+                }
+            } catch (error) {
+                console.error('Impossible de joindre le backend:', error);
+                renderEmptyCohorts();
+            }
         });
     </script>
 </body>
