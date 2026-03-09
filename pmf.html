@@ -291,12 +291,61 @@
                 });
             }
 
-            function renderEmptyCohorts(userCount = 0) {
-                const emptyCohortData = Array.from({ length: 12 }, (_, index) => ({
-                    acquired: index === 0 ? userCount : 0,
-                    week: `Semaine ${String(index + 1).padStart(2, '0')}`,
-                    values: Array(12 - index).fill(null)  // null = ...%
-                }));
+            // Initial loading state
+            tbody.innerHTML = '<tr><td colspan="14" style="padding: 2rem;"><i class="fas fa-spinner fa-spin"></i> Chargement des données Clarity...</td></tr>';
+
+            try {
+                // We need an admin token to call this API.
+                const token = localStorage.getItem('access_token');
+                
+                // Si on n'est pas connecté, on simule une structure vide avec des 0
+                if (!token) {
+                    console.warn("Utilisateur non authentifié, affichage de données à 0.");
+                    renderEmptyCohorts();
+                    return;
+                }
+
+                const response = await fetch('http://localhost:4000/api/admin/clarity-insights', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const clarityData = await response.json();
+                    
+                    // TODO: Microsoft Clarity Live Insights ne renvoie pas naturellement un tableau de cohorte.
+                    // Il faut normalement agréger les données (ex: "click" events de custom tags).
+                    // Pour le moment on mock avec des 0 basés sur la structure puisque l'API renvoie autre chose
+                    // et que vous avez demandé d'afficher "0" si pas de vraies données.
+                    
+                    console.log("Données brutes Clarity:", clarityData);
+                    
+                    // Si on arrive à extraire les cohortes depuis clarityData, on le fera ici.
+                    // Actuellement, on remplit tout à 0% en attendant l'implémentation complète des events Clarity PMF.
+                    renderEmptyCohorts();
+
+                } else {
+                    console.error('Erreur API Clarity:', response.status);
+                    renderEmptyCohorts();
+                }
+
+            } catch (error) {
+                console.error("Impossible de joindre le backend:", error);
+                renderEmptyCohorts();
+            }
+
+            // Fonction pour générer un tableau vide (0%)
+            function renderEmptyCohorts() {
+                // Structure de base pour 12 semaines avec des valeurs à 0.
+                const emptyCohortData = Array.from({ length: 12 }, (_, index) => {
+                    const values = Array(12 - index).fill(0); // Rempli de 0% jusqu'à la semaine courante relative
+                    return {
+                        acquired: 0,
+                        week: `Semaine ${String(index + 1).padStart(2, '0')}`,
+                        values: values
+                    };
+                });
                 renderTable(emptyCohortData);
             }
 
