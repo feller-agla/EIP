@@ -3,6 +3,9 @@
  */
 
 const Utils = {
+    // URL de base de l'API : utilise localhost en dev, et le domaine courant si déployé
+    API_BASE_URL: window.location.hostname === 'localhost' ? 'http://localhost:4000' : window.location.origin,
+
     // Formater un prix en FCFA
     formatCurrency: (amount) => {
         return new Intl.NumberFormat('fr-FR', {

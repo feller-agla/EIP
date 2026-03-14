@@ -2,20 +2,43 @@
  * Logic for Product Details Page
  */
 
-document.addEventListener('appReady', () => {
+document.addEventListener('appReady', async () => {
     const productId = Utils.getUrlParam('id');
     if (!productId) {
         window.location.href = 'catalogue.html';
         return;
     }
 
-    const product = Store.getProductById(productId);
+    let product = Store.getProductById(productId);
+    
+    // Si le produit n'est pas dans le store local, forcer la récupération
     if (!product) {
-        document.getElementById('product-content').innerHTML = '<div style="text-align:center">Produit introuvable</div>';
+        await Store.fetchProducts();
+        product = Store.getProductById(productId);
+    }
+
+    if (!product) {
+        document.getElementById('product-content').innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 4rem;">Produit introuvable</div>';
         return;
     }
 
     renderProduct(product);
+
+    // Track PMF Click
+    try {
+        const session = Store.getSession();
+        const token = session ? session.access_token : null;
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        await fetch(Utils.API_BASE_URL + '/api/track/click', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({ product_id: productId })
+        });
+    } catch(e) {
+        console.error('Feature Tracking failed', e);
+    }
 });
 
 function renderProduct(product) {

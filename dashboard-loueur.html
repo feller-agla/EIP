@@ -372,10 +372,10 @@
         </div>
     </template>
 
-    <script src="assets/js/data.js"></script>
-    <script src="assets/js/utils.js"></script>
-    <script src="assets/js/store.js"></script>
-    <script src="assets/js/app.js"></script>
+    <script src="assets/js/data.js?v=2.0"></script>
+    <script src="assets/js/utils.js?v=2.0"></script>
+    <script src="assets/js/store.js?v=2.0"></script>
+    <script src="assets/js/app.js?v=2.0"></script>
     <script>
         document.addEventListener('appReady', () => {
             const user = Store.getUser();
@@ -471,7 +471,7 @@
                     const session = Store.getSession();
                     const token = session ? session.access_token : null;
 
-                    const uploadRes = await fetch('http://localhost:4000/api/upload', {
+                    const uploadRes = await fetch(Utils.API_BASE_URL + '/api/upload', {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${token}`

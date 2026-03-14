@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Créer un compte - EventBenin</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=2.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Microsoft Clarity -->
     <script type="text/javascript">
@@ -81,7 +81,7 @@
         </div>
     </div>
 
-    <script src="assets/js/store.js"></script>
+    <script src="assets/js/store.js?v=2.0"></script>
     <script>
         let currentRole = 'client';
 
@@ -131,7 +131,7 @@
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Inscription...';
 
             try {
-                const response = await fetch('http://localhost:4000/api/auth/register', {
+                const response = await fetch(Utils.API_BASE_URL + '/api/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email, password, user_type: currentRole }),

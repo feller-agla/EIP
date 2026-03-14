@@ -33,7 +33,7 @@ const Store = {
     // Fetch products from API (Async)
     fetchProducts: async () => {
         try {
-            const response = await fetch('http://localhost:4000/api/products');
+            const response = await fetch(Utils.API_BASE_URL + '/api/products');
             if (response.ok) {
                 const products = await response.json();
                 localStorage.setItem(Store.KEYS.PRODUCTS, JSON.stringify(products));
@@ -71,7 +71,7 @@ const Store = {
                 return null;
             }
 
-            const response = await fetch('http://localhost:4000/api/products', {
+            const response = await fetch(Utils.API_BASE_URL + '/api/products', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ const Store = {
                 return false;
             }
 
-            const response = await fetch(`http://localhost:4000/api/products/${id}`, {
+            const response = await fetch(`${Utils.API_BASE_URL}/api/products/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -277,7 +277,7 @@ const Store = {
     logout: async () => { // Made async for API call
         // Call backend logout endpoint
         try {
-            const response = await fetch('http://localhost:4000/api/auth/logout', {
+            const response = await fetch(Utils.API_BASE_URL + '/api/auth/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -339,7 +339,7 @@ const Store = {
         if (!token) return null;
 
         try {
-            const response = await fetch('http://localhost:4000/api/orders', {
+            const response = await fetch(Utils.API_BASE_URL + '/api/orders', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -371,7 +371,7 @@ const Store = {
         if (!token) return [];
 
         try {
-            const response = await fetch('http://localhost:4000/api/orders/my-orders', {
+            const response = await fetch(Utils.API_BASE_URL + '/api/orders/my-orders', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (response.ok) {
@@ -389,7 +389,7 @@ const Store = {
         if (!token) return [];
 
         try {
-            const response = await fetch('http://localhost:4000/api/orders/vendor-orders', {
+            const response = await fetch(Utils.API_BASE_URL + '/api/orders/vendor-orders', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (response.ok) {
@@ -406,7 +406,7 @@ const Store = {
         const token = session ? session.access_token : null;
 
         try {
-            const response = await fetch(`http://localhost:4000/api/orders/${orderId}/status`, {
+            const response = await fetch(`${Utils.API_BASE_URL}/api/orders/${orderId}/status`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

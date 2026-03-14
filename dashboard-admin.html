@@ -569,8 +569,8 @@
 
     </main>
 
-    <script src="assets/js/utils.js"></script>
-    <script src="assets/js/store.js"></script>
+    <script src="assets/js/utils.js?v=2.0"></script>
+    <script src="assets/js/store.js?v=2.0"></script>
     <script>
         let _session = null;
         let _token = null;
@@ -609,7 +609,7 @@
         // ==== STATS ====
         async function loadStats() {
             try {
-                const res = await fetch('http://localhost:4000/api/admin/stats', {
+                const res = await fetch(Utils.API_BASE_URL + '/api/admin/stats', {
                     headers: { 'Authorization': `Bearer ${_token}` }
                 });
                 if (res.ok) {
@@ -635,7 +635,7 @@
             document.getElementById('clarity-raw-display').textContent = 'Chargement depuis l\'API Clarity…';
             document.getElementById('stat-sessions').textContent = '—';
             try {
-                const res = await fetch('http://localhost:4000/api/admin/clarity-insights', {
+                const res = await fetch(Utils.API_BASE_URL + '/api/admin/clarity-insights', {
                     headers: { 'Authorization': `Bearer ${_token}` }
                 });
                 if (res.ok) {
@@ -677,7 +677,7 @@
             const tbody = document.getElementById('users-table-body');
             try {
                 // We fetch profiles from Supabase via the backend
-                const res = await fetch('http://localhost:4000/api/admin/users', {
+                const res = await fetch(Utils.API_BASE_URL + '/api/admin/users', {
                     headers: { 'Authorization': `Bearer ${_token}` }
                 });
                 if (res.ok) {
@@ -703,7 +703,7 @@
         async function loadProducts() {
             const tbody = document.getElementById('products-table-body');
             try {
-                const res = await fetch('http://localhost:4000/api/products');
+                const res = await fetch(Utils.API_BASE_URL + '/api/products');
                 if (res.ok) {
                     const data = await res.json();
                     document.getElementById('products-count-badge').textContent = (data.products?.length || 0) + ' produits';

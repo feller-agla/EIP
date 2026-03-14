@@ -83,7 +83,7 @@ function renderProducts() {
                 <h3 class="product-title"><a href="product-details.html?id=${product.id}">${product.name}</a></h3>
                 <div class="product-price">${Utils.formatCurrency(product.price)} <span>/ jour</span></div>
                 <div style="display: flex; gap: 0.5rem; margin-top: auto;">
-                    <a href="product-details.html?id=${product.id}" class="btn btn-outline btn-sm" style="flex: 1; text-align: center;">Voir</a>
+                    <button class="btn btn-outline btn-sm voirProdBtn" data-id="${product.id}" style="flex: 1; text-align: center;">Voir</button>
                     <button class="btn btn-primary btn-sm addToCartBtn" data-id="${product.id}" style="flex: 1;">
                         <i class="fas fa-cart-plus"></i>
                     </button>
@@ -101,12 +101,10 @@ function renderProducts() {
         });
     });
 
-    // Track clicks on "Voir" links
-    document.querySelectorAll('.product-card a[href*="product-details"]').forEach(link => {
-        link.addEventListener('click', () => {
-            const url = new URL(link.getAttribute('href'), window.location.href);
-            const id = url.searchParams.get('id');
-            if (id) trackProductClick(id);
+    document.querySelectorAll('.voirProdBtn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = e.currentTarget.dataset.id;
+            window.location.href = `product-details.html?id=${id}`;
         });
     });
 }
@@ -172,7 +170,7 @@ async function trackProductClick(productId) {
         const session = Store.getSession();
         const headers = { 'Content-Type': 'application/json' };
         if (session?.access_token) headers['Authorization'] = `Bearer ${session.access_token}`;
-        await fetch('http://localhost:4000/api/track/click', {
+        await fetch(Utils.API_BASE_URL + '/api/track/click', {
             method: 'POST',
             headers,
             body: JSON.stringify({ product_id: productId })
@@ -181,13 +179,3 @@ async function trackProductClick(productId) {
         // Silently ignore tracking errors
     }
 }
-
-// Add CSS keyframes for animation if not present
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-`;
-document.head.appendChild(style);
